@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ai_story_chain/core/routing/routes.dart';
-import 'package:ai_story_chain/core/theming/styles.dart';
-import 'package:ai_story_chain/core/theming/colors.dart';
-import 'package:ai_story_chain/mobile/ui/widgets/animated_background.dart';
+import 'package:ai_story_chain/core/widgets/animated_background.dart';
+import 'package:ai_story_chain/core/widgets/app_title.dart';
+import 'package:ai_story_chain/core/widgets/app_back_button.dart';
+import 'package:ai_story_chain/core/widgets/error_message.dart';
+import 'package:ai_story_chain/core/helpers/spacing.dart';
 import 'package:ai_story_chain/mobile/ui/widgets/create_room_form.dart';
 
 class CreateRoomPage extends StatefulWidget {
@@ -101,8 +103,7 @@ class _CreateRoomPageState extends State<CreateRoomPage>
     return Scaffold(
       body: Stack(
         children: [
-          // Animated Background
-          const AnimatedBackground(),
+          RepaintBoundary(child: const AnimatedBackground()),
 
           // Main Content
           Center(
@@ -111,60 +112,32 @@ class _CreateRoomPageState extends State<CreateRoomPage>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // App Title with Animation
                   AnimatedBuilder(
                     animation: _titleAnimation,
                     builder: (context, child) {
                       return Transform.scale(
                         scale: _titleAnimation.value,
                         child: Opacity(
-                          opacity: _titleAnimation.value,
-                          child: Column(
-                            children: [
-                              Text(
-                                'AI Story Chain',
-                                style: TextStyles.font80WhiteBold.copyWith(
-                                  shadows: [
-                                    Shadow(
-                                      color: ColorsManager.mainPurple
-                                          .withOpacity(0.5),
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 0),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 20.h),
-                              Container(
-                                width: 120.w,
-                                height: 5.h,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      ColorsManager.mainPurple,
-                                      const Color(0xFF00D4FF),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(2.r),
-                                ),
-                              ),
-                            ],
+                          opacity: _titleAnimation.value.clamp(0.0, 1.0),
+                          child: const AppTitle(
+                            title: 'AI Story Chain',
+                            gradientWidth: 120,
+                            gradientHeight: 5,
                           ),
                         ),
                       );
                     },
                   ),
 
-                  SizedBox(height: 80.h),
+                  verticalSpace(80),
 
-                  // Form with Animation
                   AnimatedBuilder(
                     animation: _formAnimation,
                     builder: (context, child) {
                       return Transform.translate(
                         offset: Offset(0, (1 - _formAnimation.value) * 100),
                         child: Opacity(
-                          opacity: _formAnimation.value,
+                          opacity: _formAnimation.value.clamp(0.0, 1.0),
                           child: CreateRoomForm(
                             onCreateRoom: _createRoom,
                             isLoading: _isLoading,
@@ -174,68 +147,18 @@ class _CreateRoomPageState extends State<CreateRoomPage>
                     },
                   ),
 
-                  // Error Message
                   if (_errorMessage != null) ...[
-                    SizedBox(height: 24.h),
-                    AnimatedOpacity(
-                      opacity: _errorMessage != null ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 300),
-                      child: Container(
-                        padding: EdgeInsets.all(16.w),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12.r),
-                          border: Border.all(
-                            color: Colors.red.withOpacity(0.3),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.error_outline,
-                              color: Colors.red,
-                              size: 20.w,
-                            ),
-                            SizedBox(width: 12.w),
-                            Expanded(
-                              child: Text(
-                                _errorMessage!,
-                                style: TextStyles.font16WhiteRegular.copyWith(
-                                  color: Colors.red.shade300,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    verticalSpace(24),
+                    ErrorMessage(message: _errorMessage!),
                   ],
                 ],
               ),
             ),
           ),
 
-          // Back Button
-          Positioned(
-            top: 40.h,
-            left: 24.w,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(
-                  color: ColorsManager.mainPurple.withOpacity(0.3),
-                ),
-              ),
-              child: IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: Icon(
-                  Icons.arrow_back_ios_new,
-                  color: Colors.white,
-                  size: 20.w,
-                ),
-              ),
-            ),
+          AppBackButton(
+            onPressed: () => Navigator.pop(context),
+            isMobile: false,
           ),
         ],
       ),

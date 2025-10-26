@@ -8,15 +8,14 @@ import 'package:ai_story_chain/core/widgets/error_message.dart';
 import 'package:ai_story_chain/core/helpers/spacing.dart';
 import 'package:ai_story_chain/mobile/ui/widgets/join_room_form.dart';
 
-class JoinRoomPage extends StatefulWidget {
-  const JoinRoomPage({super.key});
+class JoinScreen extends StatefulWidget {
+  const JoinScreen({super.key});
 
   @override
-  State<JoinRoomPage> createState() => _JoinRoomPageState();
+  State<JoinScreen> createState() => _JoinScreenState();
 }
 
-class _JoinRoomPageState extends State<JoinRoomPage>
-    with TickerProviderStateMixin {
+class _JoinScreenState extends State<JoinScreen> with TickerProviderStateMixin {
   late AnimationController _titleController;
   late AnimationController _formController;
   late Animation<double> _titleAnimation;
@@ -75,7 +74,7 @@ class _JoinRoomPageState extends State<JoinRoomPage>
       if (mounted) {
         Navigator.pushReplacementNamed(
           context,
-          Routes.roomPage,
+          Routes.roomScreen,
           arguments: {
             'roomCode': roomCode,
             'username': username,
@@ -98,59 +97,57 @@ class _JoinRoomPageState extends State<JoinRoomPage>
         children: [
           RepaintBoundary(child: const AnimatedBackground()),
 
-          Center(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedBuilder(
-                    animation: _titleAnimation,
-                    builder: (context, child) {
-                      return Transform.scale(
-                        scale: _titleAnimation.value,
-                        child: Opacity(
-                          opacity: _titleAnimation.value.clamp(0.0, 1.0),
-                          child: const AppTitle(
-                            title: 'AI Story Chain',
-                            gradientWidth: 120,
-                            gradientHeight: 5,
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedBuilder(
+                      animation: _titleAnimation,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: _titleAnimation.value,
+                          child: Opacity(
+                            opacity: _titleAnimation.value.clamp(0.0, 1.0),
+                            child: const AppTitle(title: 'AI Story Chain'),
                           ),
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    ),
 
-                  verticalSpace(80),
+                    verticalSpace(40),
 
-                  AnimatedBuilder(
-                    animation: _formAnimation,
-                    builder: (context, child) {
-                      return Transform.translate(
-                        offset: Offset(0, (1 - _formAnimation.value) * 100),
-                        child: Opacity(
-                          opacity: _formAnimation.value.clamp(0.0, 1.0),
-                          child: JoinRoomForm(
-                            onJoinRoom: _joinRoom,
-                            isLoading: _isLoading,
+                    AnimatedBuilder(
+                      animation: _formAnimation,
+                      builder: (context, child) {
+                        return Transform.translate(
+                          offset: Offset(0, (1 - _formAnimation.value) * 100),
+                          child: Opacity(
+                            opacity: _formAnimation.value.clamp(0.0, 1.0),
+                            child: JoinRoomForm(
+                              onJoinRoom: _joinRoom,
+                              isLoading: _isLoading,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    ),
 
-                  if (_errorMessage != null) ...[
-                    verticalSpace(24),
-                    ErrorMessage(message: _errorMessage!),
+                    if (_errorMessage != null) ...[
+                      verticalSpace(16),
+                      ErrorMessage(message: _errorMessage!),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ),
 
           AppBackButton(
             onPressed: () => Navigator.pop(context),
-            isMobile: false,
+            isMobile: true,
           ),
         ],
       ),

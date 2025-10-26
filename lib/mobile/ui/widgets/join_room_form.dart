@@ -5,31 +5,31 @@ import 'package:ai_story_chain/core/theming/styles.dart';
 import 'package:ai_story_chain/core/helpers/spacing.dart';
 import 'package:ai_story_chain/core/routing/routes.dart';
 
-class CreateRoomForm extends StatefulWidget {
-  final Function(String roomName, String username) onCreateRoom;
+class JoinRoomForm extends StatefulWidget {
+  final Function(String roomCode, String username) onJoinRoom;
   final bool isLoading;
 
-  const CreateRoomForm({
+  const JoinRoomForm({
     super.key,
-    required this.onCreateRoom,
+    required this.onJoinRoom,
     this.isLoading = false,
   });
 
   @override
-  State<CreateRoomForm> createState() => _CreateRoomFormState();
+  State<JoinRoomForm> createState() => _JoinRoomFormState();
 }
 
-class _CreateRoomFormState extends State<CreateRoomForm>
+class _JoinRoomFormState extends State<JoinRoomForm>
     with TickerProviderStateMixin {
-  final TextEditingController _roomNameController = TextEditingController();
+  final TextEditingController _roomCodeController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
-  final FocusNode _roomNameFocusNode = FocusNode();
+  final FocusNode _roomCodeFocusNode = FocusNode();
   final FocusNode _usernameFocusNode = FocusNode();
 
   late AnimationController _shimmerController;
   late Animation<double> _shimmerAnimation;
 
-  bool _isRoomNameValid = false;
+  bool _isRoomCodeValid = false;
   bool _isUsernameValid = false;
 
   @override
@@ -47,23 +47,14 @@ class _CreateRoomFormState extends State<CreateRoomForm>
 
     _shimmerController.repeat();
 
-    // Generate auto room name
-    _generateRoomName();
-
     // Listen to text changes
-    _roomNameController.addListener(_onRoomNameChanged);
+    _roomCodeController.addListener(_onRoomCodeChanged);
     _usernameController.addListener(_onUsernameChanged);
   }
 
-  void _generateRoomName() {
-    final random = DateTime.now().millisecondsSinceEpoch % 10000;
-    _roomNameController.text = 'Room-$random';
-    _isRoomNameValid = true;
-  }
-
-  void _onRoomNameChanged() {
+  void _onRoomCodeChanged() {
     setState(() {
-      _isRoomNameValid = _roomNameController.text.trim().isNotEmpty;
+      _isRoomCodeValid = _roomCodeController.text.trim().length >= 4;
     });
   }
 
@@ -75,9 +66,9 @@ class _CreateRoomFormState extends State<CreateRoomForm>
 
   @override
   void dispose() {
-    _roomNameController.dispose();
+    _roomCodeController.dispose();
     _usernameController.dispose();
-    _roomNameFocusNode.dispose();
+    _roomCodeFocusNode.dispose();
     _usernameFocusNode.dispose();
     _shimmerController.dispose();
     super.dispose();
@@ -125,7 +116,7 @@ class _CreateRoomFormState extends State<CreateRoomForm>
                   ).createShader(bounds);
                 },
                 child: Text(
-                  'Create Room',
+                  'Join Room',
                   style: TextStyles.font24WhiteBold.copyWith(
                     color: Colors.white,
                   ),
@@ -136,14 +127,15 @@ class _CreateRoomFormState extends State<CreateRoomForm>
 
           verticalSpace(20),
 
-          // Room Name Input
+          // Room Code Input
           _buildInputField(
-            controller: _roomNameController,
-            focusNode: _roomNameFocusNode,
-            label: 'Room Name',
-            hintText: 'Enter room name',
-            icon: Icons.meeting_room_outlined,
-            isValid: _isRoomNameValid,
+            controller: _roomCodeController,
+            focusNode: _roomCodeFocusNode,
+            label: 'Room Code',
+            hintText: 'Enter 4-digit room code',
+            icon: Icons.qr_code_scanner_outlined,
+            isValid: _isRoomCodeValid,
+            maxLength: 4,
           ),
 
           verticalSpace(16),
@@ -160,13 +152,13 @@ class _CreateRoomFormState extends State<CreateRoomForm>
 
           verticalSpace(24),
 
-          // Create Room Button
-          _buildCreateButton(),
+          // Join Room Button
+          _buildJoinButton(),
 
           verticalSpace(16),
 
-          // Join Existing Room Button
-          _buildJoinButton(),
+          // Create New Room Button
+          _buildCreateButton(),
         ],
       ),
     );
@@ -179,6 +171,7 @@ class _CreateRoomFormState extends State<CreateRoomForm>
     required String hintText,
     required IconData icon,
     required bool isValid,
+    int? maxLength,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,11 +209,13 @@ class _CreateRoomFormState extends State<CreateRoomForm>
             controller: controller,
             focusNode: focusNode,
             style: TextStyles.font16WhiteMedium,
+            maxLength: maxLength,
             decoration: InputDecoration(
               hintText: hintText,
               hintStyle: TextStyles.font16WhiteMedium.copyWith(
                 color: Colors.grey.withOpacity(0.6),
               ),
+              counterText: '',
               prefixIcon: Icon(
                 icon,
                 color: focusNode.hasFocus
@@ -239,8 +234,8 @@ class _CreateRoomFormState extends State<CreateRoomForm>
     );
   }
 
-  Widget _buildCreateButton() {
-    final isEnabled = _isRoomNameValid && _isUsernameValid && !widget.isLoading;
+  Widget _buildJoinButton() {
+    final isEnabled = _isRoomCodeValid && _isUsernameValid && !widget.isLoading;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -272,8 +267,8 @@ class _CreateRoomFormState extends State<CreateRoomForm>
         color: Colors.transparent,
         child: InkWell(
           onTap: isEnabled
-              ? () => widget.onCreateRoom(
-                  _roomNameController.text.trim(),
+              ? () => widget.onJoinRoom(
+                  _roomCodeController.text.trim(),
                   _usernameController.text.trim(),
                 )
               : null,
@@ -289,7 +284,7 @@ class _CreateRoomFormState extends State<CreateRoomForm>
                     ),
                   )
                 : Text(
-                    'Create Room',
+                    'Join Room',
                     style: TextStyles.font18WhiteMedium.copyWith(
                       color: isEnabled ? Colors.white : Colors.grey,
                     ),
@@ -300,16 +295,15 @@ class _CreateRoomFormState extends State<CreateRoomForm>
     );
   }
 
-  Widget _buildJoinButton() {
+  Widget _buildCreateButton() {
     return TextButton(
       onPressed: widget.isLoading
           ? null
           : () {
-              // Navigate to join room page
-              Navigator.pushReplacementNamed(context, Routes.joinScreen);
+              Navigator.pushReplacementNamed(context, Routes.createRoomScreen);
             },
       child: Text(
-        'Join Existing Room',
+        'Create New Room',
         style: TextStyles.font16WhiteMedium.copyWith(
           color: ColorsManager.mainPurple,
           decoration: TextDecoration.underline,

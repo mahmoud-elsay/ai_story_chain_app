@@ -7,23 +7,23 @@ import 'package:ai_story_chain/mobile/ui/screens/result_screen.dart';
 import 'package:ai_story_chain/desktop/ui/pages/join_room_page.dart';
 import 'package:ai_story_chain/desktop/ui/pages/create_room_page.dart';
 import 'package:ai_story_chain/mobile/ui/screens/create_room_screen.dart';
-import 'package:ai_story_chain/mobile/ui/screens/join_or_create_screen.dart';
+import 'package:ai_story_chain/mobile/ui/screens/join_screen.dart';
 
 class AppRouter {
   Route? generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case Routes.joinOrCreateScreen:
-        return MaterialPageRoute(builder: (_) => const JoinOrCreateScreen());
       case Routes.createRoomScreen:
         return MaterialPageRoute(builder: (_) => const CreateRoomScreen());
+      case Routes.joinScreen:
+        return MaterialPageRoute(builder: (_) => const JoinScreen());
       case Routes.roomScreen:
         return MaterialPageRoute(builder: (_) => const RoomScreen());
       case Routes.resultScreen:
         return MaterialPageRoute(builder: (_) => const ResultScreen());
-      case Routes.joinOrCreateRoomPage:
-        return MaterialPageRoute(builder: (_) => const JoinOrCreateRoomPage());
       case Routes.createRoomPage:
         return MaterialPageRoute(builder: (_) => const CreateRoomPage());
+      case Routes.joinRoomPage:
+        return MaterialPageRoute(builder: (_) => const JoinRoomPage());
       case Routes.roomPage:
         return MaterialPageRoute(builder: (_) => const RoomPage());
       case Routes.resultPage:
