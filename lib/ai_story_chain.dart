@@ -11,23 +11,43 @@ class AiStoryChainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(1440, 1024),
-      minTextAdapt: true,
-      child: MaterialApp(
-        title: 'AI Story Chain',
-        theme: _buildTheme(Brightness.light),
-        debugShowCheckedModeBanner: false,
-        onGenerateRoute: appRouter.generateRoute,
-        home: LayoutBuilder(
+    return MaterialApp(
+      title: 'AI Story Chain',
+      theme: _buildTheme(Brightness.light),
+      debugShowCheckedModeBanner: false,
+      builder: (context, child) {
+        return LayoutBuilder(
           builder: (context, constraints) {
-            if (constraints.maxWidth < 1000) {
-              return const CreateRoomScreen();
-            } else {
-              return const CreateRoomPage();
-            }
+            // Determine if mobile or desktop
+            final isMobile = constraints.maxWidth < 1000;
+
+            // Use different design sizes for mobile and desktop
+            final designSize = isMobile
+                ? const Size(375, 812) // iPhone X design size for mobile
+                : const Size(1440, 1024); // Desktop design size
+
+            return ScreenUtilInit(
+              designSize: designSize,
+              minTextAdapt: true,
+              child: MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaleFactor: 1.0, // Prevent system font scaling
+                ),
+                child: child!,
+              ),
+            );
           },
-        ),
+        );
+      },
+      onGenerateRoute: appRouter.generateRoute,
+      home: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth < 1000) {
+            return const CreateRoomScreen();
+          } else {
+            return const CreateRoomPage();
+          }
+        },
       ),
     );
   }

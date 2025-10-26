@@ -34,25 +34,21 @@ class _CreateRoomFormState extends State<CreateRoomForm>
   @override
   void initState() {
     super.initState();
-    
+
     _shimmerController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-    
-    _shimmerAnimation = Tween<double>(
-      begin: -1.0,
-      end: 2.0,
-    ).animate(CurvedAnimation(
-      parent: _shimmerController,
-      curve: Curves.easeInOut,
-    ));
+
+    _shimmerAnimation = Tween<double>(begin: -1.0, end: 2.0).animate(
+      CurvedAnimation(parent: _shimmerController, curve: Curves.easeInOut),
+    );
 
     _shimmerController.repeat();
 
     // Generate auto room name
     _generateRoomName();
-    
+
     // Listen to text changes
     _roomNameController.addListener(_onRoomNameChanged);
     _usernameController.addListener(_onUsernameChanged);
@@ -89,7 +85,7 @@ class _CreateRoomFormState extends State<CreateRoomForm>
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(32.w),
+      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.3),
         borderRadius: BorderRadius.circular(24.r),
@@ -129,16 +125,16 @@ class _CreateRoomFormState extends State<CreateRoomForm>
                 },
                 child: Text(
                   'Create Room',
-                  style: TextStyles.font48WhiteBold.copyWith(
+                  style: TextStyles.font24WhiteBold.copyWith(
                     color: Colors.white,
                   ),
                 ),
               );
             },
           ),
-          
-          verticalSpace(40),
-          
+
+          verticalSpace(20),
+
           // Room Name Input
           _buildInputField(
             controller: _roomNameController,
@@ -148,9 +144,9 @@ class _CreateRoomFormState extends State<CreateRoomForm>
             icon: Icons.meeting_room_outlined,
             isValid: _isRoomNameValid,
           ),
-          
-          verticalSpace(24),
-          
+
+          verticalSpace(16),
+
           // Username Input
           _buildInputField(
             controller: _usernameController,
@@ -160,14 +156,14 @@ class _CreateRoomFormState extends State<CreateRoomForm>
             icon: Icons.person_outline,
             isValid: _isUsernameValid,
           ),
-          
-          verticalSpace(40),
-          
+
+          verticalSpace(24),
+
           // Create Room Button
           _buildCreateButton(),
-          
-          verticalSpace(24),
-          
+
+          verticalSpace(16),
+
           // Join Existing Room Button
           _buildJoinButton(),
         ],
@@ -186,10 +182,7 @@ class _CreateRoomFormState extends State<CreateRoomForm>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyles.font18WhiteMedium,
-        ),
+        Text(label, style: TextStyles.font14WhiteMedium),
         verticalSpace(8),
         Container(
           decoration: BoxDecoration(
@@ -204,8 +197,8 @@ class _CreateRoomFormState extends State<CreateRoomForm>
               color: focusNode.hasFocus
                   ? ColorsManager.mainPurple
                   : isValid
-                      ? ColorsManager.mainPurple.withOpacity(0.5)
-                      : Colors.grey.withOpacity(0.3),
+                  ? ColorsManager.mainPurple.withOpacity(0.5)
+                  : Colors.grey.withOpacity(0.3),
               width: focusNode.hasFocus ? 2 : 1,
             ),
             boxShadow: focusNode.hasFocus
@@ -221,10 +214,10 @@ class _CreateRoomFormState extends State<CreateRoomForm>
           child: TextField(
             controller: controller,
             focusNode: focusNode,
-            style: TextStyles.font18WhiteMedium,
+            style: TextStyles.font16WhiteMedium,
             decoration: InputDecoration(
               hintText: hintText,
-              hintStyle: TextStyles.font18WhiteMedium.copyWith(
+              hintStyle: TextStyles.font16WhiteMedium.copyWith(
                 color: Colors.grey.withOpacity(0.6),
               ),
               prefixIcon: Icon(
@@ -235,8 +228,8 @@ class _CreateRoomFormState extends State<CreateRoomForm>
               ),
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
-                horizontal: 20.w,
-                vertical: 16.h,
+                horizontal: 16.w,
+                vertical: 14.h,
               ),
             ),
           ),
@@ -247,18 +240,15 @@ class _CreateRoomFormState extends State<CreateRoomForm>
 
   Widget _buildCreateButton() {
     final isEnabled = _isRoomNameValid && _isUsernameValid && !widget.isLoading;
-    
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       width: double.infinity,
-      height: 56.h,
+      height: 50.h,
       decoration: BoxDecoration(
         gradient: isEnabled
             ? LinearGradient(
-                colors: [
-                  ColorsManager.mainPurple,
-                  const Color(0xFF00D4FF),
-                ],
+                colors: [ColorsManager.mainPurple, const Color(0xFF00D4FF)],
               )
             : LinearGradient(
                 colors: [
@@ -282,9 +272,9 @@ class _CreateRoomFormState extends State<CreateRoomForm>
         child: InkWell(
           onTap: isEnabled
               ? () => widget.onCreateRoom(
-                    _roomNameController.text.trim(),
-                    _usernameController.text.trim(),
-                  )
+                  _roomNameController.text.trim(),
+                  _usernameController.text.trim(),
+                )
               : null,
           borderRadius: BorderRadius.circular(16.r),
           child: Center(
@@ -294,14 +284,12 @@ class _CreateRoomFormState extends State<CreateRoomForm>
                     height: 24.h,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Colors.white,
-                      ),
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
                 : Text(
                     'Create Room',
-                    style: TextStyles.font20WhiteMedium.copyWith(
+                    style: TextStyles.font18WhiteMedium.copyWith(
                       color: isEnabled ? Colors.white : Colors.grey,
                     ),
                   ),
@@ -313,13 +301,15 @@ class _CreateRoomFormState extends State<CreateRoomForm>
 
   Widget _buildJoinButton() {
     return TextButton(
-      onPressed: widget.isLoading ? null : () {
-        // Navigate to join room page
-        Navigator.pop(context);
-      },
+      onPressed: widget.isLoading
+          ? null
+          : () {
+              // Navigate to join room page
+              Navigator.pop(context);
+            },
       child: Text(
         'Join Existing Room',
-        style: TextStyles.font18WhiteMedium.copyWith(
+        style: TextStyles.font16WhiteMedium.copyWith(
           color: ColorsManager.mainPurple,
           decoration: TextDecoration.underline,
         ),

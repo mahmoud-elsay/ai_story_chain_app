@@ -124,7 +124,8 @@ class _CreateRoomScreenState extends State<CreateRoomScreen>
                               children: [
                                 Text(
                                   'AI Story Chain',
-                                  style: TextStyles.font64WhiteBold.copyWith(
+                                  textAlign: TextAlign.center,
+                                  style: TextStyles.font32WhiteBold.copyWith(
                                     shadows: [
                                       Shadow(
                                         color: ColorsManager.mainPurple
@@ -135,10 +136,10 @@ class _CreateRoomScreenState extends State<CreateRoomScreen>
                                     ],
                                   ),
                                 ),
-                                SizedBox(height: 16.h),
+                                SizedBox(height: 12.h),
                                 Container(
-                                  width: 100.w,
-                                  height: 4.h,
+                                  width: 80.w,
+                                  height: 3.h,
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
@@ -156,7 +157,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen>
                       },
                     ),
 
-                    SizedBox(height: 60.h),
+                    SizedBox(height: 40.h),
 
                     // Form with Animation
                     AnimatedBuilder(
