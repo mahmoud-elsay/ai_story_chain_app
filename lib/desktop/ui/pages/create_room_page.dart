@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ai_story_chain/core/routing/routes.dart';
-import 'package:ai_story_chain/core/widgets/animated_background.dart';
-import 'package:ai_story_chain/core/widgets/app_title.dart';
-import 'package:ai_story_chain/core/widgets/app_back_button.dart';
-import 'package:ai_story_chain/core/widgets/error_message.dart';
 import 'package:ai_story_chain/core/helpers/spacing.dart';
+import 'package:ai_story_chain/core/helpers/extension.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:ai_story_chain/core/widgets/app_title.dart';
+import 'package:ai_story_chain/core/widgets/error_message.dart';
+import 'package:ai_story_chain/core/widgets/app_back_button.dart';
+import 'package:ai_story_chain/core/widgets/animated_background.dart';
 import 'package:ai_story_chain/mobile/ui/widgets/create_room_form.dart';
 
 class CreateRoomPage extends StatefulWidget {
@@ -17,8 +18,7 @@ class CreateRoomPage extends StatefulWidget {
 
 class _CreateRoomPageState extends State<CreateRoomPage>
     with TickerProviderStateMixin {
-  late AnimationController _titleController;
-  late AnimationController _formController;
+  late AnimationController _controller;
   late Animation<double> _titleAnimation;
   late Animation<double> _formAnimation;
 
@@ -29,72 +29,59 @@ class _CreateRoomPageState extends State<CreateRoomPage>
   void initState() {
     super.initState();
 
-    _titleController = AnimationController(
+    _controller = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
 
-    _formController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
-      vsync: this,
-    );
-
     _titleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _titleController, curve: Curves.elasticOut),
+      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
     );
 
     _formAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _formController, curve: Curves.easeOutBack),
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
     );
 
-    // Start animations with delay
     Future.delayed(const Duration(milliseconds: 300), () {
-      _titleController.forward();
-    });
-
-    Future.delayed(const Duration(milliseconds: 800), () {
-      _formController.forward();
+      if (mounted) _controller.forward();
     });
   }
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _formController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   Future<void> _createRoom(String roomName, String username) async {
+    if (!mounted) return;
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(milliseconds: 500));
 
-      // TODO: Replace with actual API call
-      // final result = await roomService.createRoom(roomName, username);
-
-      // For now, simulate success
       if (mounted) {
-        Navigator.pushReplacementNamed(
-          context,
-          Routes.roomPage,
+        context.pushReplacementNamed(
+          Routes.roomPage, // Routes.roomPage will resolve to RoomPage or RoomScreen based on platform
           arguments: {
             'roomName': roomName,
             'username': username,
-            'roomCode': 'ABC123', // This would come from API
+            'roomCode': 'ABC123',
             'isHost': true,
           },
         );
       }
     } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to create room. Please try again.';
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Failed to create room. Please try again.';
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -103,9 +90,7 @@ class _CreateRoomPageState extends State<CreateRoomPage>
     return Scaffold(
       body: Stack(
         children: [
-          RepaintBoundary(child: const AnimatedBackground()),
-
-          // Main Content
+          const AnimatedBackground(),
           Center(
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -128,9 +113,7 @@ class _CreateRoomPageState extends State<CreateRoomPage>
                       );
                     },
                   ),
-
                   verticalSpace(80),
-
                   AnimatedBuilder(
                     animation: _formAnimation,
                     builder: (context, child) {
@@ -146,7 +129,6 @@ class _CreateRoomPageState extends State<CreateRoomPage>
                       );
                     },
                   ),
-
                   if (_errorMessage != null) ...[
                     verticalSpace(24),
                     ErrorMessage(message: _errorMessage!),
@@ -154,11 +136,6 @@ class _CreateRoomPageState extends State<CreateRoomPage>
                 ],
               ),
             ),
-          ),
-
-          AppBackButton(
-            onPressed: () => Navigator.pop(context),
-            isMobile: false,
           ),
         ],
       ),

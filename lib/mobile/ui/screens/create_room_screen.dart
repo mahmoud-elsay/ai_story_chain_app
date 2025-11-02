@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ai_story_chain/core/routing/routes.dart';
-import 'package:ai_story_chain/core/widgets/animated_background.dart';
-import 'package:ai_story_chain/core/widgets/app_title.dart';
-import 'package:ai_story_chain/core/widgets/app_back_button.dart';
-import 'package:ai_story_chain/core/widgets/error_message.dart';
 import 'package:ai_story_chain/core/helpers/spacing.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:ai_story_chain/core/widgets/app_title.dart';
+import 'package:ai_story_chain/core/widgets/error_message.dart';
+import 'package:ai_story_chain/core/widgets/app_back_button.dart';
+import 'package:ai_story_chain/core/widgets/animated_background.dart';
 import 'package:ai_story_chain/mobile/ui/widgets/create_room_form.dart';
 
 class CreateRoomScreen extends StatefulWidget {
@@ -152,11 +152,6 @@ class _CreateRoomScreenState extends State<CreateRoomScreen>
                 ),
               ),
             ),
-          ),
-
-          AppBackButton(
-            onPressed: () => Navigator.pop(context),
-            isMobile: true,
           ),
         ],
       ),

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ai_story_chain/core/routing/routes.dart';
-import 'package:ai_story_chain/core/widgets/animated_background.dart';
-import 'package:ai_story_chain/core/widgets/app_title.dart';
-import 'package:ai_story_chain/core/widgets/app_back_button.dart';
-import 'package:ai_story_chain/core/widgets/error_message.dart';
 import 'package:ai_story_chain/core/helpers/spacing.dart';
+import 'package:ai_story_chain/core/helpers/extension.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:ai_story_chain/core/widgets/app_title.dart';
+import 'package:ai_story_chain/core/widgets/error_message.dart';
+import 'package:ai_story_chain/core/widgets/app_back_button.dart';
+import 'package:ai_story_chain/core/widgets/animated_background.dart';
 import 'package:ai_story_chain/mobile/ui/widgets/join_room_form.dart';
 
 class JoinRoomPage extends StatefulWidget {
@@ -17,8 +18,7 @@ class JoinRoomPage extends StatefulWidget {
 
 class _JoinRoomPageState extends State<JoinRoomPage>
     with TickerProviderStateMixin {
-  late AnimationController _titleController;
-  late AnimationController _formController;
+  late AnimationController _controller;
   late Animation<double> _titleAnimation;
   late Animation<double> _formAnimation;
 
@@ -29,53 +29,47 @@ class _JoinRoomPageState extends State<JoinRoomPage>
   void initState() {
     super.initState();
 
-    _titleController = AnimationController(
+    _controller = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
 
-    _formController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
-      vsync: this,
-    );
+    _titleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
 
-    _titleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _titleController, curve: Curves.elasticOut),
-    );
-
-    _formAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _formController, curve: Curves.easeOutBack),
-    );
+    _formAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
     Future.delayed(const Duration(milliseconds: 300), () {
-      _titleController.forward();
-    });
-
-    Future.delayed(const Duration(milliseconds: 800), () {
-      _formController.forward();
+      if (mounted) _controller.forward();
     });
   }
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _formController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   Future<void> _joinRoom(String roomCode, String username) async {
+    if (!mounted) return;
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(milliseconds: 500));
 
       if (mounted) {
-        Navigator.pushReplacementNamed(
-          context,
-          Routes.roomPage,
+        context.pushReplacementNamed(
+          Routes
+              .roomPage, // Routes.roomPage will resolve to RoomPage or RoomScreen
           arguments: {
             'roomCode': roomCode,
             'username': username,
@@ -84,10 +78,12 @@ class _JoinRoomPageState extends State<JoinRoomPage>
         );
       }
     } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to join room. Please check the room code.';
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Failed to join room. Please check the room code.';
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -96,8 +92,7 @@ class _JoinRoomPageState extends State<JoinRoomPage>
     return Scaffold(
       body: Stack(
         children: [
-          RepaintBoundary(child: const AnimatedBackground()),
-
+          const AnimatedBackground(),
           Center(
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -120,9 +115,7 @@ class _JoinRoomPageState extends State<JoinRoomPage>
                       );
                     },
                   ),
-
                   verticalSpace(80),
-
                   AnimatedBuilder(
                     animation: _formAnimation,
                     builder: (context, child) {
@@ -138,7 +131,6 @@ class _JoinRoomPageState extends State<JoinRoomPage>
                       );
                     },
                   ),
-
                   if (_errorMessage != null) ...[
                     verticalSpace(24),
                     ErrorMessage(message: _errorMessage!),
@@ -147,11 +139,7 @@ class _JoinRoomPageState extends State<JoinRoomPage>
               ),
             ),
           ),
-
-          AppBackButton(
-            onPressed: () => Navigator.pop(context),
-            isMobile: false,
-          ),
+          AppBackButton(onPressed: () => context.pop(), isMobile: false),
         ],
       ),
     );
