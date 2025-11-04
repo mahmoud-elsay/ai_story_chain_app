@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ai_story_chain/core/theming/styles.dart';
 import 'package:ai_story_chain/core/helpers/spacing.dart';
+import 'package:ai_story_chain/core/helpers/extension.dart';
 import 'package:ai_story_chain/core/widgets/room_header.dart';
 import 'package:ai_story_chain/core/widgets/players_list.dart';
 import 'package:ai_story_chain/core/widgets/error_message.dart';
@@ -219,11 +220,6 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin {
                 verticalSpace(24),
               ],
             ),
-          ),
-
-          AppBackButton(
-            onPressed: () => Navigator.pop(context),
-            isMobile: false,
           ),
         ],
       ),

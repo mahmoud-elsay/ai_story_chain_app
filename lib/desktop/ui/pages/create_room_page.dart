@@ -5,7 +5,6 @@ import 'package:ai_story_chain/core/helpers/extension.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ai_story_chain/core/widgets/app_title.dart';
 import 'package:ai_story_chain/core/widgets/error_message.dart';
-import 'package:ai_story_chain/core/widgets/app_back_button.dart';
 import 'package:ai_story_chain/core/widgets/animated_background.dart';
 import 'package:ai_story_chain/mobile/ui/widgets/create_room_form.dart';
 
@@ -34,13 +33,15 @@ class _CreateRoomPageState extends State<CreateRoomPage>
       vsync: this,
     );
 
-    _titleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
-    );
+    _titleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
 
-    _formAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
-    );
+    _formAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) _controller.forward();
@@ -66,7 +67,8 @@ class _CreateRoomPageState extends State<CreateRoomPage>
 
       if (mounted) {
         context.pushReplacementNamed(
-          Routes.roomPage, // Routes.roomPage will resolve to RoomPage or RoomScreen based on platform
+          Routes
+              .roomPage, // Routes.roomPage will resolve to RoomPage or RoomScreen based on platform
           arguments: {
             'roomName': roomName,
             'username': username,
