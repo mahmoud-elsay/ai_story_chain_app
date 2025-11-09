@@ -49,24 +49,50 @@ class StoryInputArea extends StatelessWidget {
                     TextField(
                       controller: controller,
                       decoration: InputDecoration(
-                        hintText: 'Add your part to the story...',
+                        hintText:
+                            'Add your part to the story (max 300 characters)...',
                         hintStyle: TextStyles.font16WhiteRegular.copyWith(
                           color: Colors.white.withOpacity(0.5),
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.r),
-                          borderSide: BorderSide(color: ColorsManager.mainPurple),
+                          borderSide: BorderSide(
+                            color: ColorsManager.mainPurple,
+                          ),
+                        ),
+                        counterText: '${controller.text.length}/300',
+                        counterStyle: TextStyles.font16WhiteRegular.copyWith(
+                          fontSize: 12.sp,
+                        ),
+                        errorText: controller.text.length > 300
+                            ? 'Maximum 300 characters allowed'
+                            : null,
+                        errorStyle: TextStyles.font16WhiteRegular.copyWith(
+                          color: Colors.red,
+                          fontSize: 12.sp,
                         ),
                       ),
                       style: TextStyles.font16WhiteRegular,
                       maxLines: 3,
+                      maxLength: 300,
+                      onChanged: (value) {
+                        if (value.length > 300) {
+                          controller.text = value.substring(0, 300);
+                          controller.selection = TextSelection.fromPosition(
+                            TextPosition(offset: controller.text.length),
+                          );
+                        }
+                      },
                     ),
                     verticalSpace(16),
                     ElevatedButton(
                       onPressed: isLoading ? null : onSubmit,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: ColorsManager.mainPurple,
-                        padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 12.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 32.w,
+                          vertical: 12.h,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.r),
                         ),
@@ -80,10 +106,7 @@ class StoryInputArea extends StatelessWidget {
                                 strokeWidth: 2,
                               ),
                             )
-                          : Text(
-                              'Submit',
-                              style: TextStyles.font18WhiteMedium,
-                            ),
+                          : Text('Submit', style: TextStyles.font18WhiteMedium),
                     ),
                   ],
                 ],

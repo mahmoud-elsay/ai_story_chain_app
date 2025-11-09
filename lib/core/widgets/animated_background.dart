@@ -1,11 +1,14 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'package:flutter/material.dart';
+import 'web_optimized_background.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class AnimatedBackground extends StatefulWidget {
   const AnimatedBackground({super.key});
 
   @override
-  State<AnimatedBackground> createState() => _AnimatedBackgroundState();
+  State<AnimatedBackground> createState() =>
+      kIsWeb ? _WebAnimatedBackgroundState() : _AnimatedBackgroundState();
 }
 
 class _AnimatedBackgroundState extends State<AnimatedBackground>
@@ -100,6 +103,13 @@ class Particle {
     required this.speed,
     required this.opacity,
   });
+}
+
+class _WebAnimatedBackgroundState extends State<AnimatedBackground> {
+  @override
+  Widget build(BuildContext context) {
+    return const WebOptimizedBackground();
+  }
 }
 
 class BackgroundPainter extends CustomPainter {

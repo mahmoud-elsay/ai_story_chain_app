@@ -1,9 +1,12 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:ai_story_chain/core/theming/styles.dart';
+import 'package:ai_story_chain/core/routing/routes.dart';
 import 'package:ai_story_chain/core/helpers/spacing.dart';
 import 'package:ai_story_chain/core/helpers/extension.dart';
 import 'package:ai_story_chain/core/widgets/room_header.dart';
 import 'package:ai_story_chain/core/widgets/players_list.dart';
+import 'package:ai_story_chain/core/data/dummy_room_data.dart';
 import 'package:ai_story_chain/core/widgets/error_message.dart';
 import 'package:ai_story_chain/core/widgets/story_display.dart';
 import 'package:ai_story_chain/core/widgets/app_back_button.dart';
@@ -32,7 +35,10 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin {
 
   List<String> players = [];
   List<Map<String, String>> storyChain = [];
+  Map<String, int> playerScores = {};
   int currentTurnIndex = 0;
+  int currentRound = 0;
+  int totalRounds = 3;
   bool isGameStarted = false;
   bool isLoading = false;
   String? errorMessage;
@@ -90,9 +96,58 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin {
     setState(() {
       isGameStarted = true;
       currentTurnIndex = 0;
+      currentRound = 1;
       storyChain.clear();
-      _addToStory('AI', 'Once upon a time in a distant land...');
+      players.forEach((player) => playerScores[player] = 0);
+      _addToStory(
+        'AI',
+        'Round $currentRound: Once upon a time in a distant land...',
+      );
     });
+  }
+
+  void _endRound() {
+    // Calculate scores for the round
+    players.forEach((player) {
+      final contributions = storyChain.where(
+        (entry) => entry['author'] == player,
+      );
+      final roundScore =
+          contributions.length *
+          10; // Basic scoring: 10 points per contribution
+      playerScores[player] = (playerScores[player] ?? 0) + roundScore;
+    });
+
+    if (currentRound < totalRounds) {
+      setState(() {
+        currentRound++;
+        storyChain.clear();
+        currentTurnIndex = 0;
+        _addToStory('AI', 'Round $currentRound: A new chapter begins...');
+      });
+    } else {
+      _endGame();
+    }
+  }
+
+  void _endGame() {
+    // For demonstration, merge player scores with dummy scores
+    final Map<String, int> finalScores = Map.from(dummyScores);
+    playerScores.forEach((player, score) {
+      finalScores[player] = (finalScores[player] ?? 0) + score;
+    });
+
+    // Add some random bonus points for variety (0-50 points)
+    final random = Random();
+    finalScores.forEach((player, score) {
+      finalScores[player] = score + random.nextInt(50);
+    });
+
+    // Navigate to result screen with scores
+    context.pushReplacementNamed(
+      Routes.resultPage,
+      arguments: {'scores': finalScores, 'roomName': roomName},
+    );
   }
 
   void _addToStory(String author, String text) {
@@ -144,7 +199,10 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin {
       currentTurnIndex = (currentTurnIndex + 1) % players.length;
       setState(() {});
 
-      if (players[currentTurnIndex] != username) {
+      // Check if we completed a round (all players have contributed)
+      if (currentTurnIndex == 0) {
+        _endRound();
+      } else if (players[currentTurnIndex] != username) {
         _simulateOtherTurn();
       }
     });
@@ -169,6 +227,15 @@ class _RoomPageState extends State<RoomPage> with TickerProviderStateMixin {
                 ),
 
                 verticalSpace(24),
+
+                if (isGameStarted) ...[
+                  Text(
+                    'Round $currentRound of $totalRounds',
+                    style: TextStyles.font24WhiteMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  verticalSpace(16),
+                ],
 
                 PlayersList(
                   players: players,

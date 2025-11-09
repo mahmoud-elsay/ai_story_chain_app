@@ -18,7 +18,10 @@ class AppRouter {
       case Routes.joinScreen:
         return MaterialPageRoute(builder: (_) => const JoinScreen());
       case Routes.roomScreen:
-        return MaterialPageRoute(builder: (_) => const RoomScreen());
+        return MaterialPageRoute(
+          builder: (_) =>
+              RoomScreen(args: settings.arguments as Map<String, dynamic>?),
+        );
       case Routes.resultScreen:
         return MaterialPageRoute(builder: (_) => const ResultScreen());
       case Routes.createRoomPage:
@@ -31,7 +34,11 @@ class AppRouter {
                 builder: (_) =>
                     RoomPage(args: settings.arguments as Map<String, dynamic>?),
               )
-            : MaterialPageRoute(builder: (_) => const RoomScreen());
+            : MaterialPageRoute(
+                builder: (_) => RoomScreen(
+                  args: settings.arguments as Map<String, dynamic>?,
+                ),
+              );
       case Routes.resultPage:
         return kIsWeb
             ? MaterialPageRoute(builder: (_) => const ResultPage())

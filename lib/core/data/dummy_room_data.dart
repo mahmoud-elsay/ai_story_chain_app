@@ -10,3 +10,11 @@ List<Map<String, String>> dummyStoryChain = [
 ];
 
 List<String> dummyPlayers = ['HostUser', 'Player1', 'Player2', 'Player3'];
+
+// Dummy scoring data for demonstration
+Map<String, int> dummyScores = {
+  'Player1': 280, // Most active player
+  'HostUser': 240, // Host with good participation
+  'Player2': 220, // Regular contributor
+  'Player3': 190, // Less active player
+};
